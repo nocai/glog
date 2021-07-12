@@ -1049,6 +1049,31 @@ func (v Verbose) Infof(format string, args ...interface{}) {
 	}
 }
 
+type TraceNo string
+
+func T(i interface{}) TraceNo {
+	return TraceNo(fmt.Sprint(i))
+}
+
+func (t TraceNo) Info(args ...interface{}) {
+	t.Infof("", args...)
+}
+
+func (t TraceNo) Infoln(args ...interface{}) {
+	t.Infof("\n", args...)
+}
+
+func (t TraceNo) Infof(format string, args ...interface{}) {
+	format, args = t.formatAndArgs(format, args...)
+	logging.printf(infoLog, format, args...)
+}
+
+func (t TraceNo) formatAndArgs(format string, args ...interface{}) (string, []interface{}) {
+	s := make([]interface{}, 0, len(args)+1)
+	s = append(s, t)
+	return "[%v] " + format, append(s, args...)
+}
+
 // Info logs to the INFO log.
 // Arguments are handled in the manner of fmt.Print; a newline is appended if missing.
 func Info(args ...interface{}) {
