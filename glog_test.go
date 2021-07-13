@@ -98,6 +98,29 @@ func TestInfo(t *testing.T) {
 	}
 }
 
+func TestTraceNo(t *testing.T) {
+	setFlags()
+	defer logging.swap(logging.newBuffers())
+
+	traceNo := T("123456")
+
+	traceNo.Info("info")
+	if !contains(infoLog, "I", t) {
+		t.Errorf("Info has wrong character: %q", contents(infoLog))
+	}
+	if !contains(infoLog, "123456", t) {
+		t.Errorf("Info has wrong character: %q", contents(infoLog))
+	}
+	if !contains(infoLog, "info", t) {
+		t.Error("Info failed")
+	}
+
+	traceNo.Infof("info: %v", "TestTraceNo")
+	if !contains(infoLog, "TestTraceNo", t) {
+		t.Error("Info failed")
+	}
+}
+
 func TestInfoDepth(t *testing.T) {
 	setFlags()
 	defer logging.swap(logging.newBuffers())
@@ -409,7 +432,7 @@ func TestLogBacktraceAt(t *testing.T) {
 
 func BenchmarkHeader(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		buf, _, _ := logging.header(infoLog, 0)
+		buf, _, _ := logging.header(infoLog, emptyTraceNo, 0)
 		logging.putBuffer(buf)
 	}
 }
