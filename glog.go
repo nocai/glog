@@ -73,6 +73,7 @@ package glog
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -1053,66 +1054,18 @@ func (v Verbose) Infof(format string, args ...interface{}) {
 	}
 }
 
-type TraceNo string
-
-var emptyTraceNo TraceNo
-
-func T(i interface{}) TraceNo {
-	return TraceNo(fmt.Sprint(i))
+func (v Verbose) T(i interface{}) TraceNo {
+	if v {
+		return T(i)
+	}
+	return emptyTraceNo
 }
 
-func (t TraceNo) Info(args ...interface{}) {
-	logging.print(infoLog, t, args...)
-}
-
-func (t TraceNo) Infoln(args ...interface{}) {
-	logging.println(infoLog, t, args...)
-}
-
-func (t TraceNo) Infof(format string, args ...interface{}) {
-	logging.printf(infoLog, t, format, args...)
-}
-
-func (t TraceNo) Warning(args ...interface{}) {
-	logging.print(warningLog, t, args...)
-}
-
-func (t TraceNo) Warningln(args ...interface{}) {
-	logging.println(warningLog, t, args...)
-}
-
-func (t TraceNo) Warningf(format string, args ...interface{}) {
-	logging.printf(warningLog, t, format, args...)
-}
-
-func (t TraceNo) Error(args ...interface{}) {
-	logging.print(errorLog, t, args...)
-}
-
-func (t TraceNo) Errorln(args ...interface{}) {
-	logging.println(errorLog, t, args...)
-}
-
-func (t TraceNo) Errorf(format string, args ...interface{}) {
-	logging.printf(errorLog, t, format, args...)
-}
-
-func (t TraceNo) Fatal(args ...interface{}) {
-	logging.print(fatalLog, t, args...)
-}
-
-func (t TraceNo) Fatalln(args ...interface{}) {
-	logging.println(fatalLog, t, args...)
-}
-
-func (t TraceNo) Fatalf(format string, args ...interface{}) {
-	logging.printf(fatalLog, t, format, args...)
-}
-
-func (t TraceNo) formatAndArgs(format string, args ...interface{}) (string, []interface{}) {
-	s := make([]interface{}, 0, len(args)+1)
-	s = append(s, t)
-	return "[%v] " + format, append(s, args...)
+func (v Verbose) TContext(ctx context.Context) TraceNo {
+	if v {
+		return TContext(ctx)
+	}
+	return emptyTraceNo
 }
 
 // Info logs to the INFO log.

@@ -18,6 +18,7 @@ package glog
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	stdLog "log"
 	"path/filepath"
@@ -109,6 +110,30 @@ func TestTraceNo(t *testing.T) {
 		t.Errorf("Info has wrong character: %q", contents(infoLog))
 	}
 	if !contains(infoLog, "123456", t) {
+		t.Errorf("Info has wrong character: %q", contents(infoLog))
+	}
+	if !contains(infoLog, "info", t) {
+		t.Error("Info failed")
+	}
+
+	traceNo.Infof("info: %v", "TestTraceNo")
+	if !contains(infoLog, "TestTraceNo", t) {
+		t.Error("Info failed")
+	}
+}
+
+func TestTraceNoContext(t *testing.T) {
+	setFlags()
+	defer logging.swap(logging.newBuffers())
+
+	ctx := WithTraceNo(context.Background())
+	traceNo := TContext(ctx)
+
+	traceNo.Info("info")
+	if !contains(infoLog, "I", t) {
+		t.Errorf("Info has wrong character: %q", contents(infoLog))
+	}
+	if !contains(infoLog, string(traceNo), t) {
 		t.Errorf("Info has wrong character: %q", contents(infoLog))
 	}
 	if !contains(infoLog, "info", t) {
